@@ -47,7 +47,8 @@ const xpForLevel = (level) => Math.floor(100 * Math.pow(1.5, level - 1));
  *
  * Fields:
  *   name        – display name
- *   emoji       – map marker icon
+ *   emoji       – fallback icon if image fails to load
+ *   image       – real photo URL (loremflickr.com — free, no API key needed)
  *   rarity      – one of: Common | Uncommon | Rare | Epic | Legendary | Mythic
  *   xp          – experience awarded on successful catch
  *   difficulty  – sweet-spot width multiplier (1 = full width, 0.2 = very narrow)
@@ -55,44 +56,44 @@ const xpForLevel = (level) => Math.floor(100 * Math.pow(1.5, level - 1));
  */
 const ANIMALS = [
     // ── Common ────────────────────────────────────────────────────────────────
-    { name: 'Red Fox',        emoji: '🦊', rarity: 'Common',    xp: 10,   difficulty: 1.0,  description: 'A cunning urban fox. Often seen raiding bins at night.' },
-    { name: 'Brown Bear',     emoji: '🐻', rarity: 'Common',    xp: 10,   difficulty: 1.0,  description: 'A large omnivore. Surprisingly fast for its size.' },
-    { name: 'Rabbit',         emoji: '🐇', rarity: 'Common',    xp: 10,   difficulty: 1.0,  description: 'Twitchy and fast. Loves clover and garden vegetables.' },
-    { name: 'Hedgehog',       emoji: '🦔', rarity: 'Common',    xp: 10,   difficulty: 1.0,  description: 'A prickly night-time wanderer. Rolls into a ball when scared.' },
-    { name: 'Duck',           emoji: '🦆', rarity: 'Common',    xp: 10,   difficulty: 1.0,  description: 'Found near ponds. Quacks loudly when disturbed.' },
+    { name: 'Red Fox',        emoji: '🦊', image: 'https://loremflickr.com/120/120/red,fox',         rarity: 'Common',    xp: 10,   difficulty: 1.0,  description: 'A cunning urban fox. Often seen raiding bins at night.' },
+    { name: 'Brown Bear',     emoji: '🐻', image: 'https://loremflickr.com/120/120/brown,bear',      rarity: 'Common',    xp: 10,   difficulty: 1.0,  description: 'A large omnivore. Surprisingly fast for its size.' },
+    { name: 'Rabbit',         emoji: '🐇', image: 'https://loremflickr.com/120/120/rabbit',          rarity: 'Common',    xp: 10,   difficulty: 1.0,  description: 'Twitchy and fast. Loves clover and garden vegetables.' },
+    { name: 'Hedgehog',       emoji: '🦔', image: 'https://loremflickr.com/120/120/hedgehog',        rarity: 'Common',    xp: 10,   difficulty: 1.0,  description: 'A prickly night-time wanderer. Rolls into a ball when scared.' },
+    { name: 'Duck',           emoji: '🦆', image: 'https://loremflickr.com/120/120/duck,bird',       rarity: 'Common',    xp: 10,   difficulty: 1.0,  description: 'Found near ponds. Quacks loudly when disturbed.' },
 
     // ── Uncommon ──────────────────────────────────────────────────────────────
-    { name: 'Deer',           emoji: '🦌', rarity: 'Uncommon',  xp: 25,   difficulty: 0.75, description: 'A graceful creature. Freeze if you spot one — they spook easily.' },
-    { name: 'Raccoon',        emoji: '🦝', rarity: 'Uncommon',  xp: 25,   difficulty: 0.75, description: 'A masked bandit. Highly intelligent and surprisingly dexterous.' },
-    { name: 'Wild Boar',      emoji: '🐗', rarity: 'Uncommon',  xp: 25,   difficulty: 0.75, description: 'Stocky and stubborn. Better approached from downwind.' },
-    { name: 'Flamingo',       emoji: '🦩', rarity: 'Uncommon',  xp: 25,   difficulty: 0.75, description: 'Elegant pink wader. Gets its colour from the shrimp it eats.' },
-    { name: 'Otter',          emoji: '🦦', rarity: 'Uncommon',  xp: 25,   difficulty: 0.75, description: 'Playful river-dweller. Holds hands with its partner while sleeping.' },
+    { name: 'Deer',           emoji: '🦌', image: 'https://loremflickr.com/120/120/deer,wildlife',   rarity: 'Uncommon',  xp: 25,   difficulty: 0.75, description: 'A graceful creature. Freeze if you spot one — they spook easily.' },
+    { name: 'Raccoon',        emoji: '🦝', image: 'https://loremflickr.com/120/120/raccoon',         rarity: 'Uncommon',  xp: 25,   difficulty: 0.75, description: 'A masked bandit. Highly intelligent and surprisingly dexterous.' },
+    { name: 'Wild Boar',      emoji: '🐗', image: 'https://loremflickr.com/120/120/boar,pig',        rarity: 'Uncommon',  xp: 25,   difficulty: 0.75, description: 'Stocky and stubborn. Better approached from downwind.' },
+    { name: 'Flamingo',       emoji: '🦩', image: 'https://loremflickr.com/120/120/flamingo',        rarity: 'Uncommon',  xp: 25,   difficulty: 0.75, description: 'Elegant pink wader. Gets its colour from the shrimp it eats.' },
+    { name: 'Otter',          emoji: '🦦', image: 'https://loremflickr.com/120/120/otter',           rarity: 'Uncommon',  xp: 25,   difficulty: 0.75, description: 'Playful river-dweller. Holds hands with its partner while sleeping.' },
 
     // ── Rare ──────────────────────────────────────────────────────────────────
-    { name: 'Snow Leopard',   emoji: '🐆', rarity: 'Rare',      xp: 50,   difficulty: 0.55, description: 'A phantom of the mountains. Rarely spotted, even by experts.' },
-    { name: 'White Wolf',     emoji: '🐺', rarity: 'Rare',      xp: 50,   difficulty: 0.55, description: 'Leads the pack through blizzards. Its howl can be heard for miles.' },
-    { name: 'Peacock',        emoji: '🦚', rarity: 'Rare',      xp: 50,   difficulty: 0.55, description: 'Iridescent tail feathers with hundreds of "eyes". A true showstopper.' },
-    { name: 'Axolotl',        emoji: '🦎', rarity: 'Rare',      xp: 50,   difficulty: 0.55, description: 'The smiling salamander. Can regenerate lost limbs in weeks.' },
-    { name: 'Narwhal',        emoji: '🦄', rarity: 'Rare',      xp: 50,   difficulty: 0.55, description: 'The unicorn of the sea. Its tusk is actually a giant tooth.' },
+    { name: 'Snow Leopard',   emoji: '🐆', image: 'https://loremflickr.com/120/120/snow,leopard',    rarity: 'Rare',      xp: 50,   difficulty: 0.55, description: 'A phantom of the mountains. Rarely spotted, even by experts.' },
+    { name: 'White Wolf',     emoji: '🐺', image: 'https://loremflickr.com/120/120/white,wolf',      rarity: 'Rare',      xp: 50,   difficulty: 0.55, description: 'Leads the pack through blizzards. Its howl can be heard for miles.' },
+    { name: 'Peacock',        emoji: '🦚', image: 'https://loremflickr.com/120/120/peacock',         rarity: 'Rare',      xp: 50,   difficulty: 0.55, description: 'Iridescent tail feathers with hundreds of "eyes". A true showstopper.' },
+    { name: 'Axolotl',        emoji: '🦎', image: 'https://loremflickr.com/120/120/axolotl',         rarity: 'Rare',      xp: 50,   difficulty: 0.55, description: 'The smiling salamander. Can regenerate lost limbs in weeks.' },
+    { name: 'Narwhal',        emoji: '🦄', image: 'https://loremflickr.com/120/120/narwhal',         rarity: 'Rare',      xp: 50,   difficulty: 0.55, description: 'The unicorn of the sea. Its tusk is actually a giant tooth.' },
 
     // ── Epic ──────────────────────────────────────────────────────────────────
-    { name: 'Black Panther',  emoji: '🐈‍⬛', rarity: 'Epic',      xp: 150,  difficulty: 0.4,  description: 'A melanistic leopard. Almost invisible in dense jungle canopy.' },
-    { name: 'Giant Squid',    emoji: '🦑', rarity: 'Epic',      xp: 150,  difficulty: 0.4,  description: 'A deep-sea titan. Its eyes are the size of footballs.' },
-    { name: 'Komodo Dragon',  emoji: '🦕', rarity: 'Epic',      xp: 150,  difficulty: 0.4,  description: 'Ancient reptile with venomous saliva. Top predator of its island.' },
-    { name: 'Electric Eel',   emoji: '⚡',  rarity: 'Epic',      xp: 150,  difficulty: 0.4,  description: 'Can discharge up to 600 volts. Approach with extreme caution!' },
-    { name: 'Mantis Shrimp',  emoji: '🦐', rarity: 'Epic',      xp: 150,  difficulty: 0.4,  description: 'Punches with the force of a bullet. Sees 16 types of colour.' },
+    { name: 'Black Panther',  emoji: '🐈‍⬛', image: 'https://loremflickr.com/120/120/black,panther',   rarity: 'Epic',      xp: 150,  difficulty: 0.4,  description: 'A melanistic leopard. Almost invisible in dense jungle canopy.' },
+    { name: 'Giant Squid',    emoji: '🦑', image: 'https://loremflickr.com/120/120/giant,squid',     rarity: 'Epic',      xp: 150,  difficulty: 0.4,  description: 'A deep-sea titan. Its eyes are the size of footballs.' },
+    { name: 'Komodo Dragon',  emoji: '🦕', image: 'https://loremflickr.com/120/120/komodo,dragon',   rarity: 'Epic',      xp: 150,  difficulty: 0.4,  description: 'Ancient reptile with venomous saliva. Top predator of its island.' },
+    { name: 'Electric Eel',   emoji: '⚡',  image: 'https://loremflickr.com/120/120/electric,eel',    rarity: 'Epic',      xp: 150,  difficulty: 0.4,  description: 'Can discharge up to 600 volts. Approach with extreme caution!' },
+    { name: 'Mantis Shrimp',  emoji: '🦐', image: 'https://loremflickr.com/120/120/mantis,shrimp',   rarity: 'Epic',      xp: 150,  difficulty: 0.4,  description: 'Punches with the force of a bullet. Sees 16 types of colour.' },
 
     // ── Legendary ─────────────────────────────────────────────────────────────
-    { name: 'White Tiger',    emoji: '🐅', rarity: 'Legendary', xp: 500,  difficulty: 0.3,  description: 'A majestic colour morph. Fewer than 100 exist worldwide.' },
-    { name: 'Loch Ness Monster', emoji: '🐉', rarity: 'Legendary', xp: 500, difficulty: 0.3, description: 'Lurks in the Scottish highlands. Extremely camera-shy.' },
-    { name: 'Thunderbird',    emoji: '🦅', rarity: 'Legendary', xp: 500,  difficulty: 0.3,  description: 'A storm-spirit of indigenous legend. Its wingbeats summon thunder.' },
-    { name: 'Coelacanth',     emoji: '🐟', rarity: 'Legendary', xp: 500,  difficulty: 0.3,  description: 'A "living fossil" unchanged for 400 million years. Thought extinct.' },
-    { name: 'Quetzal',        emoji: '🦜', rarity: 'Legendary', xp: 500,  difficulty: 0.3,  description: 'Sacred bird of the Maya. Its tail feathers can reach 1 metre long.' },
+    { name: 'White Tiger',       emoji: '🐅', image: 'https://loremflickr.com/120/120/white,tiger',   rarity: 'Legendary', xp: 500,  difficulty: 0.3,  description: 'A majestic colour morph. Fewer than 100 exist worldwide.' },
+    { name: 'Loch Ness Monster', emoji: '🐉', image: 'https://loremflickr.com/120/120/loch,ness',     rarity: 'Legendary', xp: 500,  difficulty: 0.3,  description: 'Lurks in the Scottish highlands. Extremely camera-shy.' },
+    { name: 'Thunderbird',       emoji: '🦅', image: 'https://loremflickr.com/120/120/eagle,storm',   rarity: 'Legendary', xp: 500,  difficulty: 0.3,  description: 'A storm-spirit of indigenous legend. Its wingbeats summon thunder.' },
+    { name: 'Coelacanth',        emoji: '🐟', image: 'https://loremflickr.com/120/120/deep,sea,fish', rarity: 'Legendary', xp: 500,  difficulty: 0.3,  description: 'A "living fossil" unchanged for 400 million years. Thought extinct.' },
+    { name: 'Quetzal',           emoji: '🦜', image: 'https://loremflickr.com/120/120/quetzal,bird',  rarity: 'Legendary', xp: 500,  difficulty: 0.3,  description: 'Sacred bird of the Maya. Its tail feathers can reach 1 metre long.' },
 
     // ── Mythic ────────────────────────────────────────────────────────────────
-    { name: 'Golden Phoenix',  emoji: '🔥', rarity: 'Mythic',   xp: 2000, difficulty: 0.2,  description: 'Born from flame and reborn from ash. The rarest creature in existence.' },
-    { name: 'Crystal Unicorn', emoji: '🦄', rarity: 'Mythic',   xp: 2000, difficulty: 0.2,  description: 'Its horn heals any wound. Vanishes if approached with ill intent.' },
-    { name: 'Shadow Dragon',   emoji: '🐲', rarity: 'Mythic',   xp: 2000, difficulty: 0.2,  description: 'Older than recorded history. Lives between worlds.' },
+    { name: 'Golden Phoenix',  emoji: '🔥', image: 'https://loremflickr.com/120/120/phoenix,fire',    rarity: 'Mythic',    xp: 2000, difficulty: 0.2,  description: 'Born from flame and reborn from ash. The rarest creature in existence.' },
+    { name: 'Crystal Unicorn', emoji: '🦄', image: 'https://loremflickr.com/120/120/unicorn,fantasy', rarity: 'Mythic',    xp: 2000, difficulty: 0.2,  description: 'Its horn heals any wound. Vanishes if approached with ill intent.' },
+    { name: 'Shadow Dragon',   emoji: '🐲', image: 'https://loremflickr.com/120/120/dragon,fantasy',  rarity: 'Mythic',    xp: 2000, difficulty: 0.2,  description: 'Older than recorded history. Lives between worlds.' },
 ];
 
 /** Weighted spawn pool — common animals appear more often than rare ones. */
@@ -249,11 +250,15 @@ function spawnAnimal(forcedAnimal = null) {
     const lat = state.position.lat + latOffset;
     const lng = state.position.lng + lngOffset;
 
-    // Build the Leaflet divIcon with the animal's emoji.
+    // Build the Leaflet divIcon — photo inside a circle, emoji as fallback.
     const icon = L.divIcon({
-        html: `<div class="animal-marker" data-rarity="${animal.rarity}">${animal.emoji}</div>`,
-        iconSize: [40, 40],
-        iconAnchor: [20, 20],
+        html: `<div class="animal-marker" data-rarity="${animal.rarity}">
+                 <img src="${animal.image}" alt="${animal.name}"
+                      onerror="this.style.display='none';this.nextSibling.style.display='flex'">
+                 <span class="marker-emoji-fallback" style="display:none">${animal.emoji}</span>
+               </div>`,
+        iconSize: [48, 48],
+        iconAnchor: [24, 24],
         className: '',
     });
 
@@ -647,7 +652,11 @@ function renderCollection() {
         const card = document.createElement('div');
         card.className = `creature-card rarity-${creature.rarity.toLowerCase()}`;
         card.innerHTML = `
-            <div class="creature-emoji">${creature.emoji}</div>
+            <div class="creature-photo-wrap">
+                <img class="creature-photo" src="${creature.image}" alt="${creature.name}"
+                     onerror="this.style.display='none';this.nextSibling.style.display='flex'">
+                <div class="creature-emoji-fallback" style="display:none">${creature.emoji}</div>
+            </div>
             <div class="creature-name">${creature.name}</div>
             <div class="creature-rarity">${creature.rarity}</div>
             <div class="creature-desc">${creature.description}</div>
