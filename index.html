@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoCapture: Animal Spawns</title>
+    <meta name="description" content="Catch rare animals in your neighborhood with GeoCapture!">
+    <!-- Leaflet map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+
+        <!-- ── Top Header ───────────────────────────────────────────── -->
+        <header>
+            <div class="logo">
+                <span class="pulse"></span>
+                <h1>GeoCapture</h1>
+            </div>
+
+            <div class="user-stats">
+                <!-- XP progress bar -->
+                <div class="xp-container" title="Experience Points">
+                    <div id="xp-bar" class="xp-bar"></div>
+                    <span id="level-display">LVL 1</span>
+                </div>
+                <!-- Energy meter; max is updated by JS on level-up -->
+                <div class="energy-container" title="Energy — 1 refills every 2 minutes">
+                    ⚡ <span id="energy-count">10</span>/<span id="energy-max">10</span>
+                    <div id="energy-fill" class="energy-fill"></div>
+                </div>
+                <!-- Catch streak badge (hidden until streak > 1) -->
+                <div id="streak-badge" class="streak-badge hidden" title="Consecutive catch streak">
+                    🔥 <span id="streak-count">0</span>x
+                </div>
+            </div>
+
+            <div class="stats">
+                <button id="collection-toggle" class="glass-btn">
+                    🐾 Collection (<span id="count">0</span>)
+                </button>
+            </div>
+        </header>
+
+        <!-- ── Map ──────────────────────────────────────────────────── -->
+        <div id="map"></div>
+
+        <!-- ── Catch Mini-Game Overlay ──────────────────────────────── -->
+        <div id="catch-game" class="mini-game-overlay hidden">
+            <div class="game-container glass">
+                <div class="game-header">
+                    <h3 id="game-animal-name">Animal</h3>
+                    <span id="game-rarity-badge" class="rarity-badge">Common</span>
+                </div>
+                <p>Catch chance: <span id="game-chance">--</span>%</p>
+                <div class="reflex-meter">
+                    <div class="sweet-spot" id="sweet-spot"></div>
+                    <div class="slider" id="slider"></div>
+                </div>
+                <div class="game-actions">
+                    <button id="mini-game-btn" class="catch-btn">CAPTURE!</button>
+                    <button id="flee-btn" class="flee-btn">Flee</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Nearby Notification ──────────────────────────────────── -->
+        <div id="catch-notification" class="hidden">
+            <div class="notif-content">
+                <h3 id="notif-title">Nearby!</h3>
+                <p id="notif-name"></p>
+                <!-- Distance from player to animal -->
+                <p id="notif-distance" class="notif-distance"></p>
+                <button id="catch-btn" class="catch-btn">CATCH!</button>
+            </div>
+        </div>
+
+        <!-- ── Collection Modal ─────────────────────────────────────── -->
+        <div id="collection-modal" class="modal hidden">
+            <div class="modal-content glass">
+                <span class="close">&times;</span>
+                <h2>Your Captured Creatures</h2>
+                <div class="collection-stats">
+                    <span id="collection-total">0 caught</span>
+                    <span id="collection-unique">0 unique</span>
+                </div>
+                <div id="captured-list" class="grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Admin Debug Panel ────────────────────────────────────── -->
+        <!--
+            Admin / Developer mode for testing without walking around.
+            Toggle visibility with the ⚙️ button in the corner.
+        -->
+        <div id="debug-panel" class="debug hidden">
+            <h3>⚙️ Admin Debug Mode</h3>
+
+            <fieldset class="debug-section">
+                <legend>Spawn Controls</legend>
+                <button id="spawn-here" class="debug-btn">Force Spawn Here</button>
+                <button id="clear-all" class="debug-btn danger">Clear Map</button>
+                <label>Fast Spawn (every 5 s)
+                    <input type="checkbox" id="fast-spawn-toggle">
+                </label>
+                <label>Spawn specific animal:
+                    <select id="spawn-select"></select>
+                </label>
+                <button id="spawn-specific" class="debug-btn">Spawn Selected</button>
+            </fieldset>
+
+            <fieldset class="debug-section">
+                <legend>Teleport</legend>
+                <label>Lat: <input type="number" id="tp-lat" step="0.0001" placeholder="e.g. 37.7749"></label>
+                <label>Lng: <input type="number" id="tp-lng" step="0.0001" placeholder="e.g. -122.4194"></label>
+                <button id="teleport-btn" class="debug-btn">Teleport</button>
+            </fieldset>
+
+            <fieldset class="debug-section">
+                <legend>Player Cheats</legend>
+                <button id="refill-energy" class="debug-btn">Refill Energy</button>
+                <label>Add XP:
+                    <input type="number" id="add-xp-amt" value="100" min="1" max="9999" style="width:70px">
+                </label>
+                <button id="add-xp-btn" class="debug-btn">+ XP</button>
+                <button id="reset-save" class="debug-btn danger">Reset Save</button>
+            </fieldset>
+
+            <fieldset class="debug-section">
+                <legend>Info</legend>
+                <p id="debug-coords" class="debug-info">Position: --</p>
+                <p id="debug-spawns" class="debug-info">Active spawns: 0</p>
+            </fieldset>
+        </div>
+
+        <!-- Toggle button for debug panel (bottom-right corner) -->
+        <button id="debug-toggle" class="debug-toggle" title="Toggle Admin Debug Mode">⚙️</button>
+
+    </div><!-- /#app -->
+
+    <!-- Leaflet map library -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="app.js"></script>
+</body>
+</html>

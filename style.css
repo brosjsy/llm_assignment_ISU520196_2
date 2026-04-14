@@ -1,0 +1,642 @@
+/* ─── Design Tokens ───────────────────────────────────────────────────────── */
+:root {
+    --primary:      #6366f1;   /* indigo */
+    --primary-light:#818cf8;
+    --accent:       #f43f5e;   /* rose */
+    --success:      #22c55e;
+    --warn:         #f59e0b;
+    --bg-dark:      #0f172a;
+    --bg-card:      #1e293b;
+    --text:         #f1f5f9;
+    --text-muted:   #94a3b8;
+    --glass-bg:     rgba(255,255,255,0.08);
+    --glass-border: rgba(255,255,255,0.15);
+
+    /* Rarity colours */
+    --common:    #94a3b8;
+    --uncommon:  #22c55e;
+    --rare:      #3b82f6;
+    --epic:      #a855f7;
+    --legendary: #f59e0b;
+    --mythic:    #f43f5e;
+}
+
+/* ─── Reset / Base ────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body, html {
+    height: 100%;
+    font-family: 'Outfit', system-ui, sans-serif;
+    background: var(--bg-dark);
+    color: var(--text);
+    overflow: hidden;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* ─── Header ──────────────────────────────────────────────────────────────── */
+header {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.logo h1 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--primary-light);
+    letter-spacing: 0.02em;
+}
+
+/* Animated pulse dot next to the logo */
+.pulse {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 0 0 rgba(34,197,94,0.6);
+    animation: pulse-ring 2s ease-out infinite;
+    flex-shrink: 0;
+}
+
+@keyframes pulse-ring {
+    0%   { box-shadow: 0 0 0 0   rgba(34,197,94,0.6); }
+    70%  { box-shadow: 0 0 0 8px rgba(34,197,94,0);   }
+    100% { box-shadow: 0 0 0 0   rgba(34,197,94,0);   }
+}
+
+.user-stats {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+/* XP bar */
+.xp-container {
+    position: relative;
+    width: 90px; height: 18px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 9px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.xp-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    border-radius: 9px;
+    transition: width 0.4s ease;
+}
+
+#level-display {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    pointer-events: none;
+}
+
+/* Energy meter */
+.energy-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.energy-fill {
+    position: absolute;
+    bottom: -3px; left: 0;
+    height: 3px;
+    width: 100%;
+    background: var(--warn);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+}
+
+/* Catch streak badge */
+.streak-badge {
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 99px;
+    animation: pop 0.3s ease;
+}
+
+@keyframes pop {
+    0%   { transform: scale(0.7); }
+    60%  { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+/* Collection button */
+.stats { flex-shrink: 0; }
+
+.glass-btn {
+    background: var(--glass-bg);
+    color: var(--text);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 6px 14px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: background 0.2s, transform 0.1s;
+}
+
+.glass-btn:hover { background: rgba(255,255,255,0.15); }
+.glass-btn:active { transform: scale(0.97); }
+
+/* ─── Map ─────────────────────────────────────────────────────────────────── */
+#map {
+    flex: 1;
+    width: 100%;
+    padding-top: 60px; /* clear the fixed header */
+}
+
+/* ─── Animal Map Markers ──────────────────────────────────────────────────── */
+.animal-marker {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(15,23,42,0.75);
+    border: 2px solid rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+    animation: float 3s ease-in-out infinite;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    transition: transform 0.2s;
+}
+
+.animal-marker:hover { transform: scale(1.15); }
+
+/* Rarity glow on markers */
+.animal-marker[data-rarity="Epic"]      { border-color: var(--epic);      box-shadow: 0 0 10px var(--epic); }
+.animal-marker[data-rarity="Legendary"] { border-color: var(--legendary);  box-shadow: 0 0 14px var(--legendary); }
+.animal-marker[data-rarity="Mythic"]    { border-color: var(--mythic);     box-shadow: 0 0 18px var(--mythic); animation: float 3s ease-in-out infinite, mythic-glow 2s ease-in-out infinite; }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-6px); }
+}
+
+@keyframes mythic-glow {
+    0%, 100% { box-shadow: 0 0 18px var(--mythic); }
+    50%       { box-shadow: 0 0 30px var(--mythic), 0 0 50px rgba(244,63,94,0.3); }
+}
+
+/* ─── Catch Notification Banner ───────────────────────────────────────────── */
+#catch-notification {
+    position: absolute;
+    bottom: 90px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 1100;
+    animation: slide-up 0.3s ease;
+}
+
+@keyframes slide-up {
+    from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.notif-content {
+    background: rgba(15,23,42,0.9);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 16px 24px;
+    text-align: center;
+    min-width: 220px;
+}
+
+.notif-content h3 { font-size: 1rem; font-weight: 700; color: var(--primary-light); margin-bottom: 4px; }
+.notif-content p  { font-size: 0.85rem; color: var(--text-muted); }
+.notif-distance   { font-size: 0.75rem !important; color: var(--warn) !important; margin-top: 2px; }
+
+/* ─── Mini-Game Overlay ───────────────────────────────────────────────────── */
+.mini-game-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1200;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.game-container {
+    background: rgba(15,23,42,0.92);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 28px 32px;
+    text-align: center;
+    width: min(360px, 90vw);
+}
+
+.game-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.game-header h3 { font-size: 1.2rem; font-weight: 700; }
+
+.rarity-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 99px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+}
+
+.rarity-badge[data-rarity="Common"]    { color: var(--common);    border-color: var(--common); }
+.rarity-badge[data-rarity="Uncommon"]  { color: var(--uncommon);  border-color: var(--uncommon); }
+.rarity-badge[data-rarity="Rare"]      { color: var(--rare);      border-color: var(--rare); }
+.rarity-badge[data-rarity="Epic"]      { color: var(--epic);      border-color: var(--epic); }
+.rarity-badge[data-rarity="Legendary"] { color: var(--legendary); border-color: var(--legendary); }
+.rarity-badge[data-rarity="Mythic"]    { color: var(--mythic);    border-color: var(--mythic); }
+
+.game-container p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; }
+
+/* Reflex slider track */
+.reflex-meter {
+    position: relative;
+    height: 28px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 1px solid var(--glass-border);
+}
+
+.sweet-spot {
+    position: absolute;
+    top: 0; bottom: 0;
+    background: rgba(34,197,94,0.35);
+    border: 2px solid var(--success);
+    border-radius: 6px;
+    transition: left 0.1s;
+}
+
+.slider {
+    position: absolute;
+    top: 4px; bottom: 4px;
+    width: 10px;
+    background: #fff;
+    border-radius: 5px;
+    left: 0;
+    box-shadow: 0 0 8px rgba(255,255,255,0.7);
+}
+
+.game-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.catch-btn {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 24px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    letter-spacing: 0.05em;
+}
+
+.catch-btn:hover  { opacity: 0.88; }
+.catch-btn:active { transform: scale(0.96); }
+
+.flee-btn {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.flee-btn:hover { color: var(--text); border-color: var(--text-muted); }
+
+/* Shake animation for miss feedback */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-8px); }
+    40%       { transform: translateX(8px); }
+    60%       { transform: translateX(-5px); }
+    80%       { transform: translateX(5px); }
+}
+.shake { animation: shake 0.45s ease; }
+
+/* ─── Collection Modal ────────────────────────────────────────────────────── */
+.modal {
+    position: absolute;
+    inset: 0;
+    z-index: 1300;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    padding: 16px;
+}
+
+.modal-content {
+    background: rgba(15,23,42,0.95);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 24px;
+    width: min(700px, 100%);
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modal-content h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 6px; }
+
+.collection-stats {
+    display: flex;
+    gap: 16px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+.close {
+    position: absolute;
+    top: 16px; right: 20px;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    line-height: 1;
+    transition: color 0.2s;
+}
+.close:hover { color: var(--text); }
+
+/* Creature card grid */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.empty-collection {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--text-muted);
+    padding: 32px 0;
+    font-size: 0.9rem;
+}
+
+.creature-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 14px 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.creature-card:hover { transform: translateY(-3px); }
+
+.creature-emoji { font-size: 2rem; }
+.creature-name  { font-size: 0.8rem; font-weight: 700; }
+.creature-rarity{ font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.creature-desc  { font-size: 0.65rem; color: var(--text-muted); line-height: 1.4; margin-top: 4px; }
+
+/* Rarity card themes */
+.rarity-common    { border-color: var(--common);    }
+.rarity-common    .creature-rarity { color: var(--common); }
+.rarity-uncommon  { border-color: var(--uncommon);  }
+.rarity-uncommon  .creature-rarity { color: var(--uncommon); }
+.rarity-rare      { border-color: var(--rare);      }
+.rarity-rare      .creature-rarity { color: var(--rare); }
+.rarity-epic      { border-color: var(--epic);      box-shadow: 0 0 8px rgba(168,85,247,0.2); }
+.rarity-epic      .creature-rarity { color: var(--epic); }
+.rarity-legendary { border-color: var(--legendary); box-shadow: 0 0 10px rgba(245,158,11,0.25); }
+.rarity-legendary .creature-rarity { color: var(--legendary); }
+.rarity-mythic    { border-color: var(--mythic);    box-shadow: 0 0 14px rgba(244,63,94,0.35); animation: mythic-card 3s ease-in-out infinite; }
+.rarity-mythic    .creature-rarity { color: var(--mythic); }
+
+@keyframes mythic-card {
+    0%, 100% { box-shadow: 0 0 14px rgba(244,63,94,0.35); }
+    50%       { box-shadow: 0 0 28px rgba(244,63,94,0.6); }
+}
+
+.release-btn {
+    margin-top: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 3px 10px;
+    font-size: 0.65rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.release-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ─── Debug / Admin Panel ─────────────────────────────────────────────────── */
+.debug {
+    position: absolute;
+    bottom: 60px; right: 12px;
+    z-index: 1100;
+    background: rgba(15,23,42,0.95);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 14px;
+    width: 260px;
+    max-height: 80vh;
+    overflow-y: auto;
+    font-size: 0.78rem;
+    backdrop-filter: blur(12px);
+}
+
+.debug h3 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--primary-light);
+}
+
+.debug-section {
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.debug-section legend {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    padding: 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.debug-section label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    font-size: 0.75rem;
+}
+
+.debug-section label input[type="checkbox"] {
+    width: auto;
+    align-self: flex-start;
+}
+
+.debug-section input[type="number"],
+.debug-section select {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 4px 6px;
+    font-size: 0.75rem;
+    width: 100%;
+    font-family: inherit;
+}
+
+.debug-btn {
+    display: block;
+    width: 100%;
+    margin-top: 6px;
+    background: rgba(99,102,241,0.2);
+    color: var(--primary-light);
+    border: 1px solid rgba(99,102,241,0.4);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.debug-btn:hover   { background: rgba(99,102,241,0.35); }
+.debug-btn.danger  { background: rgba(244,63,94,0.15); color: var(--accent); border-color: rgba(244,63,94,0.4); }
+.debug-btn.danger:hover { background: rgba(244,63,94,0.3); }
+
+.debug-info {
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    margin-top: 4px;
+    word-break: break-all;
+}
+
+/* Toggle button (bottom-right corner) */
+.debug-toggle {
+    position: absolute;
+    bottom: 16px; right: 16px;
+    z-index: 1100;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    background: rgba(15,23,42,0.85);
+    color: var(--text);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(8px);
+    transition: background 0.2s, transform 0.15s;
+}
+.debug-toggle:hover  { background: rgba(99,102,241,0.3); }
+.debug-toggle:active { transform: scale(0.9); }
+
+/* ─── Toast Notifications ─────────────────────────────────────────────────── */
+.toast {
+    position: fixed;
+    bottom: 72px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    padding: 10px 20px;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+    animation: slide-up 0.25s ease, fade-out 0.4s ease 3.1s forwards;
+    white-space: nowrap;
+    max-width: 90vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.toast-success { background: rgba(34,197,94,0.85);  color: #fff; }
+.toast-error   { background: rgba(244,63,94,0.85);  color: #fff; }
+.toast-warn    { background: rgba(245,158,11,0.85); color: #000; }
+.toast-info    { background: rgba(99,102,241,0.85); color: #fff; }
+
+@keyframes fade-out {
+    to { opacity: 0; transform: translateX(-50%) translateY(10px); }
+}
+
+/* ─── Utility ─────────────────────────────────────────────────────────────── */
+.hidden { display: none !important; }
+
+/* Glassmorphism helper */
+.glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+}
+
+/* ─── Responsive: mobile ──────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    header { flex-wrap: wrap; padding: 8px 12px; }
+    .xp-container { width: 70px; }
+    .debug { width: calc(100vw - 24px); right: 12px; }
+    .grid  { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+}
